@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang='zh-CN'>
 <head>
 <meta charset='UTF-8'>
@@ -120,7 +120,31 @@ function render() {
 function renderHome() {
   app.innerHTML = `<div class="container home fade-in">
     <div class="card" style="text-align:center">
-      <div class="crystal">🔮</div>
+      <div class="crystal" style="font-size:64px;margin-bottom:16px">
+        <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="36" cy="36" r="34" fill="url(#dangerGlow)" opacity="0.12"/>
+          <path d="M22 28C24 24 30 22 36 22" stroke="url(#dangerGrad)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M22 28C20 32 22 36 24 38" stroke="url(#dangerGrad)" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"/>
+          <circle cx="24" cy="27" r="2" fill="url(#dangerGrad)"/>
+          <path d="M50 28C48 24 42 22 36 22" stroke="url(#dangerGrad)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M50 28C52 32 50 36 48 38" stroke="url(#dangerGrad)" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"/>
+          <circle cx="48" cy="27" r="2" fill="url(#dangerGrad)"/>
+          <path d="M28 46C30 50 36 52 36 52C36 52 42 50 44 46" stroke="url(#dangerGrad)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M22 48C26 42 30 40 36 40C42 40 46 42 50 48" stroke="url(#dangerGrad)" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.3"/>
+          <path d="M14 18L18 22" stroke="url(#dangerGrad)" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+          <path d="M58 18L54 22" stroke="url(#dangerGrad)" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+          <defs>
+            <linearGradient id="dangerGrad" x1="18" y1="22" x2="54" y2="52">
+              <stop stop-color="#E8435D"/>
+              <stop offset="1" stop-color="#FF8A6E"/>
+            </linearGradient>
+            <radialGradient id="dangerGlow" cx="0.5" cy="0.5" r="0.5">
+              <stop stop-color="#E8435D"/>
+              <stop offset="1" stop-color="#FF8A6E" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+        </svg>
+      </div>
       <h1>你体内藏着哪种<br>危险人格？</h1>
       <p class="sub">一次不太正经的隐藏人格小测试</p>
       <div class="desc-card">
