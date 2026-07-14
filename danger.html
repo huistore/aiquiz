@@ -1,0 +1,354 @@
+﻿<!DOCTYPE html>
+<html lang='zh-CN'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>危险人格心理测试</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#FFF5F0,#FFF0F5,#FFEDE1,#FFF5F0);min-height:100vh;color:#2D1B13}
+.container{max-width:430px;margin:0 auto;padding:20px 0;min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:16px}
+.card{background:rgba(255,255,255,0.75);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-radius:24px;padding:24px;box-shadow:0 8px 32px rgba(139,90,60,0.08);width:398px;max-width:calc(100vw - 32px)}
+.home{text-align:center;flex:1}
+.crystal{font-size:72px;margin-bottom:16px;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+h1{font-size:28px;font-weight:800;color:#2D1B13;line-height:1.3;margin-bottom:8px}
+.sub{font-size:16px;color:#8B6B5A;margin-bottom:32px}
+.desc-card{background:rgba(255,255,255,0.7);border-radius:24px;padding:24px;margin-bottom:32px;text-align:center;width:100%}
+.desc-card p{font-size:15px;color:#6B4A3A;line-height:1.8;margin-bottom:8px}
+.desc-card p:last-child{margin-bottom:0}
+.btn-start,.btn-next{background:linear-gradient(135deg,#E8435D,#FF8A6E);color:#fff;border:none;border-radius:50px;padding:16px 48px;font-size:18px;font-weight:700;cursor:pointer;transition:all .3s;width:100%;max-width:280px}
+.btn-start:hover,.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,67,93,0.3)}
+.btn-next:disabled{opacity:0.4;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.progress-text{font-size:14px;color:#8B6B5A;margin-bottom:8px;text-align:center}
+.progress-bar{height:6px;background:#FFE8E0;border-radius:3px;overflow:hidden;width:100%;margin-bottom:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#E8435D,#FF8A6E);border-radius:3px;transition:width .5s ease}
+.q-num{font-size:14px;color:#E8435D;font-weight:600;margin-bottom:8px}
+.q-title{font-size:18px;font-weight:700;color:#2D1B13;line-height:1.5;margin-bottom:24px}
+.option{display:block;width:100%;padding:16px 20px;margin-bottom:12px;background:#fff;border:2px solid #FFE8E0;border-radius:16px;font-size:15px;color:#2D1B13;cursor:pointer;transition:all .2s;text-align:left}
+.option:hover{border-color:#FF9E80;background:#FFF5F0}
+.option.selected{border-color:#E8435D;background:#FFF0F0;color:#E8435D;font-weight:600}
+.quiz-card{flex:1;display:flex;flex-direction:column;min-height:400px}
+.options-wrap{flex:1}
+.result-card{text-align:center}
+.result-icon{font-size:64px;margin-bottom:12px}
+.result-name{font-size:26px;font-weight:800;color:#2D1B13;margin-bottom:4px}
+.result-attr{font-size:15px;color:#8B6B5A;margin-bottom:20px}
+.result-comment{background:rgba(232,67,93,0.08);border-radius:16px;padding:16px;font-size:15px;color:#6B4A3A;line-height:1.6;margin-bottom:24px;font-style:italic}
+.result-analysis{text-align:left;background:rgba(255,255,255,0.6);border-radius:16px;padding:20px;margin-bottom:24px}
+.result-analysis p{font-size:14px;color:#4A3428;line-height:1.9;margin-bottom:12px}
+.result-analysis p:last-child{margin-bottom:0}
+.radar-wrap{width:100%;max-width:320px;margin:0 auto 24px}
+.share-text{font-size:15px;color:#E8435D;font-weight:600;margin-bottom:24px;padding:16px;background:rgba(232,67,93,0.06);border-radius:16px}
+.activate-wrap{width:100%;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;text-align:center}
+.activate-wrap .icon{font-size:56px}
+.activate-wrap h2{font-size:20px;font-weight:700;color:#2D1B13}
+.activate-wrap p{font-size:14px;color:#8B6B5A;line-height:1.6}
+.activate-input{width:100%;padding:14px 16px;border:2px solid #FFE8E0;border-radius:16px;font-size:16px;text-align:center;outline:none;transition:border-color .2s;color:#2D1B13;background:#fff;letter-spacing:2px}
+.activate-input:focus{border-color:#E8435D}
+.activate-input::placeholder{letter-spacing:0;color:#C0A090}
+.activate-err{font-size:13px;color:#E8435D;display:none}
+.activate-btn{background:linear-gradient(135deg,#E8435D,#FF8A6E);color:#fff;border:none;border-radius:50px;padding:14px 40px;font-size:16px;font-weight:700;cursor:pointer;transition:all .3s;width:100%;max-width:200px}
+.activate-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,67,93,0.3)}
+.btn-restart{background:linear-gradient(135deg,#E8435D,#FF8A6E);color:#fff;border:none;border-radius:50px;padding:14px 40px;font-size:16px;font-weight:700;cursor:pointer;transition:all .3s;display:inline-block}
+.btn-restart:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,67,93,0.3)}
+.fade-in{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.scores-wrap{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:20px}
+.score-tag{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+</style>
+</head>
+<body>
+<div class='container' id='app'></div>
+<script>
+
+const questions = [
+  {order:1, title:`如果第二天需要早起，你会定几个闹钟？`, options:[`1 个，响了就走`,`2 个，给自己留点缓冲`,`3 个，怕自己根本醒不过来`,`4 个以上，主打一个和自己拉锯`], scores:[`dou_s`,`controller`,`self_punisher`,`dou_m`]},
+  {order:2, title:`多年未见的老朋友约你见面，你会选哪里？`, options:[`氛围不错的小酒吧`,`咖啡馆或奶茶店`,`直接约饭，边吃边聊`,`哪里都行，对方定就好`], scores:[`npd`,`schemer`,`bpd`,`rampage`]},
+  {order:3, title:`你同意“爱情到最后都会变成亲情”这句话吗？`, options:[`同意，关系总会进入稳定期`,`不同意，爱就该一直有火花`,`没想法，遇到人再说`,`看情况，有的人会，有的人不会`], scores:[`controller`,`dou_s`,`yandere`,`self_punisher`]},
+  {order:4, title:`你觉得缘分是？`, options:[`上天注定的`,`靠自己争取的`,`虚无缥缈的`,`无所谓，来了就接着`], scores:[`bpd`,`controller`,`npd`,`dou_m`]},
+  {order:5, title:`你对做饭这件事有兴趣吗？`, options:[`完全没兴趣，能不做就不做`,`有一点兴趣，但主要看心情`,`非常感兴趣，愿意慢慢研究`,`偶尔尝试，失败了也能接受`], scores:[`dou_s`,`schemer`,`self_punisher`,`rampage`]},
+  {order:6, title:`如果可以给过去的自己一条建议，你会说什么？`, options:[`一定要努力学习，别浪费机会`,`不要太一意孤行，三思而后行`,`珍惜和家人在一起的时间`,`不要为了任何一个人而卑微`], scores:[`controller`,`yandere`,`dou_m`,`npd`]},
+  {order:7, title:`如果有人借了你一笔小钱，后来忘记还了，你会？`, options:[`会主动问，没什么不好意思的`,`不问，有点开不了口`,`偶尔侧面提醒一下`,`表面不说，但心里已经记账了`], scores:[`controller`,`dou_m`,`schemer`,`bpd`]},
+  {order:8, title:`分手之后，你还能和前任做朋友吗？`, options:[`能，过去了就过去了`,`不能，没必要再联系`,`看情况，要看分得体不体面`,`视心情而定，我说了算`], scores:[`dou_s`,`self_punisher`,`yandere`,`npd`]},
+  {order:9, title:`排队等餐太久，你会怎么做？`, options:[`直接不等了，换一家`,`改天再来，不想浪费心情`,`先看看别人点了什么，再决定`,`找熟人或想办法快一点`], scores:[`rampage`,`bpd`,`dou_m`,`npd`]},
+  {order:10, title:`你和朋友发生冲突，你通常会？`, options:[`马上摊牌，别憋着`,`冷处理，先让自己冷静`,`闷在心里，越想越难受`,`用玩笑化解，但心里未必真过去`], scores:[`dou_s`,`self_punisher`,`bpd`,`yandere`]},
+  {order:11, title:`遇到喜欢的人，你会怎么做？`, options:[`主动靠近，喜欢就别装`,`暗示等待，看对方有没有反应`,`静观其变，怕自己太主动`,`假装不在意，但其实一直观察`], scores:[`dou_s`,`yandere`,`self_punisher`,`schemer`]},
+  {order:12, title:`工作或学习中犯错时，你会？`, options:[`承认问题，然后赶紧修正`,`先稳住场面，别让自己太难看`,`反复自责，觉得自己不该这样`,`表面没事，私下疯狂补救`], scores:[`controller`,`npd`,`self_punisher`,`bpd`]},
+  {order:13, title:`面对突如其来的变化，你会？`, options:[`立刻行动，先处理再说`,`拖一拖，看看事情会不会自己过去`,`想找人商量，不想一个人扛`,`表面随和，心里开始疯狂演算`], scores:[`rampage`,`dou_m`,`bpd`,`yandere`]},
+  {order:14, title:`你喜欢的电影类型更接近哪一种？`, options:[`爱情片，最好有点拉锯`,`动作片，节奏快一点`,`惊悚片，越刺激越清醒`,`反转片，最好谁都猜不到结局`], scores:[`yandere`,`dou_s`,`self_punisher`,`rampage`]},
+  {order:15, title:`遇到陌生人搭讪，你会？`, options:[`先观察对方目的，再决定态度`,`礼貌回应，但保持距离`,`下意识回避，有点不自在`,`直接开玩笑，把节奏带走`], scores:[`schemer`,`controller`,`bpd`,`rampage`]},
+  {order:16, title:`在聚会中，你更倾向于？`, options:[`主导话题，让场子别冷`,`安静旁听，别人聊我就听`,`找一两个熟人小范围聊天`,`观察每个人的反应，心里默默打分`], scores:[`npd`,`dou_m`,`yandere`,`schemer`]},
+  {order:17, title:`朋友背后议论你，你会？`, options:[`当面问清楚，别在背后搞事`,`假装没事，但心里会介意`,`先收集信息，看看到底谁说的`,`自省一下，是不是自己哪里做得不好`], scores:[`controller`,`dou_m`,`schemer`,`bpd`]},
+  {order:18, title:`喜欢的东西被别人抢先拿走，你会？`, options:[`强势争取，喜欢就要拿到`,`算了，反正也不是非要不可`,`暗中较劲，下次一定抢回来`,`直接炸毛，凭什么又是我错过`], scores:[`dou_s`,`self_punisher`,`schemer`,`rampage`]},
+  {order:19, title:`你更喜欢哪种社交方式？`, options:[`面对面聊，直接看反应`,`视频或语音，有距离但不冷谈`,`文字聊天，方便慢慢表达`,`独自活动，别人别太打扰我`], scores:[`dou_s`,`dou_m`,`yandere`,`npd`]},
+  {order:20, title:`别人给你建议时，你通常会？`, options:[`有道理就采纳`,`部分采纳，但保留自己的想法`,`不爱听，尤其是对方太自以为是的时侯`,`表面听着，心里已经开始反驳`], scores:[`controller`,`yandere`,`npd`,`rampage`]}
+];
+
+const results = [
+  {id:`dou_s`, name:`抖 S`, attr:`抖 S（主）+ 病娇 + 腹黑怪`, comment:`心里有条线，别人别乱碰，我全都看在眼里。`, radar:{dou_s:100,dou_m:12,yandere:89,schemer:86,self_punisher:31,controller:71,rampage:67,bpd:28,npd:64}, radar_text:`你不是不好惹，你是只让值得的人靠近。`, share_text:`别试探我，我脾气好是因为你还没碰到线。`, analysis:[`你是一个有精神洁癖的人，对自己喜欢的人和事物有强烈掌控欲。生活中，你有自己的规则和节奏，暗地里精于心机，别人永远看不透你的底牌。你只对真正值得的人展现温柔，其余的全靠套路和智慧。`,`在感情里，你不是那种轻易上头、随便交付真心的人。你会观察、会试探、会判断对方值不值得。一旦你真的认定一个人，你的占有欲和保护欲就会同时上线。嘴上可能很淡，心里却已经把边界画得清清楚楚：谁能靠近，谁该滚远，你比谁都明白。`,`你不喜欢被别人安排，更讨厌有人对你指手画脚。别人以为你只是有点强势，其实你真正危险的地方在于：你能忍，但你不会忘；你能笑，但你不一定真的原谅。你很少无意义发疯，因为你更喜欢在合适的时机精准出手。`,`你的危险感不是大吵大闹，而是“我表面没事，但我什么都知道”。别人如果真碰到你的底线，就会发现你不是没脾气，只是平时懒得浪费火力。`]},
+  {id:`dou_m`, name:`抖 M`, attr:`抖 M（主）+ 自虐狂 + BPD（边缘型人格）`, comment:`被掌控也甘之如饴，虐自己一点都不冤。`, radar:{dou_s:36,dou_m:100,yandere:62,schemer:43,self_punisher:91,controller:48,rampage:19,bpd:88,npd:25}, radar_text:`你不是软弱，你只是太容易把感受放大。`, share_text:`我不是恋爱脑，我只是很容易被情绪拿捏。`, analysis:[`你容易顺从和依赖他人，情绪波动明显。你在感情中深情投入，但也会自我牺牲。被掌控和挑战刺激你，你懂得从压力和微虐中获得奇妙满足感。`,`你不是没有主见，只是很多时候你会下意识先照顾别人的情绪。别人一句话、一个态度变化，就可能让你想很多。你嘴上说“没事”，心里可能已经把所有细节翻来覆去复盘了三遍。你很容易为关系投入，也很容易在关系里消耗自己。`,`你的危险点在于：你明明知道有些事情会让自己难受，却还是忍不住靠近。你对强烈情绪有一种奇怪的依赖感，平淡太久反而会觉得不真实。你不是喜欢痛苦，而是某些拉锯、在意、患得患失，会让你觉得“我还活着，我还在认真感受”。`,`在别人眼里，你可能温柔、好说话、有点软。但真正了解你的人会知道，你内心的小剧场非常热闹。你可以为了喜欢的人降低姿态，也可以在积攒太久之后突然情绪决堤。`]},
+  {id:`yandere`, name:`病娇`, attr:`病娇（主）+ 控制狂 + NPD（自恋型人格）`, comment:`爱得深、掌控得狠，顺便自带光环。`, radar:{dou_s:66,dou_m:32,yandere:100,schemer:49,self_punisher:55,controller:92,rampage:28,bpd:73,npd:84}, radar_text:`你不是占有欲强，你只是无法接受自己不是唯一。`, share_text:`我可以很甜，但前提是你只能偏向于我。`, analysis:[`对你喜欢的人，你的占有欲几乎病态，同时在生活中喜欢掌控一切。你自信、果断，有自己的规则和计划，别人总是你的背景板。感情和行动都带有强烈目的性。`,`你不是那种随随便便喜欢一个人的类型。你一旦上心，就很难只是浅浅喜欢。你会在意对方的语气、回复速度、朋友圈动态、和谁走得近，甚至能从一点小细节里脑补出完整剧情。你嘴上可能还在装冷静，但心里早就开始拉警报。`,`你的危险点在于：你很难接受“不确定”。模糊关系、忽冷忽热、没有明确回应，这些都会让你非常不舒服。你要的不是普通喜欢，而是明确的偏爱、确定的位置、被坚定选择的感觉。`,`与此同时，你又不是完全卑微型人格。你有自信，也有骄傲。你可以很深情，但你也希望自己在关系里是特别的、被重视的、无法替代的。你不是想控制所有人，你只是很难忍受自己认真对待的人把你当成可有可无。`]},
+  {id:`schemer`, name:`腹黑怪`, attr:`腹黑怪（主）+ 暴走人格 + 抖 S`, comment:`冷面笑匠，一炸全场，别人永远猜不到下一步。`, radar:{dou_s:81,dou_m:18,yandere:58,schemer:100,self_punisher:31,controller:74,rampage:83,bpd:42,npd:69}, radar_text:`你不是心眼多，你只是脑子没闲着。`, share_text:`我不说，不代表我不知道。`, analysis:[`你表面冷静，内心心机满满，偶尔暴走，行动力惊人。喜欢套路和策略，观察周围人一举一动，情绪爆发时无人能挡。你的存在总让人既害怕又好奇。`,`你不是那种把情绪全写在脸上的人。很多时候，你看起来只是安静、礼貌、甚至有点好说话，但其实你一直在观察。谁是真心，谁在演，谁说话带刺，谁想占便宜，你心里都记得很清楚。`,`你的危险点在于，你不一定当场反击。你更擅长先收集信息，再选择合适的时机出手。别人以为事情过去了，其实你只是暂时没动。你不是没脾气，你只是觉得没必要把底牌提前亮出来。`,`但你也不是永远冷静。一旦有人反复挑战你的底线，你的暴走人格会突然上线。那时候你就不是阴阳怪气，而是直接让对方知道什么叫“别惹看起来很安静的人”。`]},
+  {id:`self_punisher`, name:`自虐狂`, attr:`自虐狂（主）+ 抖 M + 病娇`, comment:`自虐自嗨两不误，虐心又甜心。`, radar:{dou_s:37,dou_m:90,yandere:86,schemer:44,self_punisher:100,controller:58,rampage:22,bpd:76,npd:29}, radar_text:`你不是自虐，你只是太会把难过咽下去。`, share_text:`我嘴上说算了，心里已经碎成二维码。`, analysis:[`你在生活中容易过度投入和自我牺牲，享受顺从与感情波动带来的刺激。你的情感丰富而敏感，默默承受压力，却从中获得独特满足感。`,`你是那种很容易把事情往自己身上揽的人。关系出问题，你先想是不是自己不够好；工作学习出错，你先反复复盘哪里没做好；别人情绪不好，你也容易下意识觉得是不是自己哪里惹到对方。你不是没有脾气，只是习惯先消化自己。`,`你的危险点在于，你对“忍耐”这件事太熟练了。你可以嘴上说没事，心里却已经难受到不行。你可以继续付出，继续照顾别人，继续表现得很正常，但内心早就默默扣血。`,`感情里的你尤其容易上头。你一旦喜欢，就会很认真，很能忍，也很容易因为一点点回应开心很久。别人觉得你太敏感，但其实你只是太在乎。你并不是真的喜欢受伤，你只是太习惯用付出来证明自己值得被爱。`]},
+  {id:`controller`, name:`控制狂`, attr:`控制狂（主）+ NPD（自恋型人格）+ 抖 S`, comment:`掌控全场，顺便帅得不要不要的。`, radar:{dou_s:82,dou_m:15,yandere:55,schemer:69,self_punisher:34,controller:100,rampage:61,bpd:29,npd:88}, radar_text:`你不是控制欲强，你只是受不了事情失控。`, share_text:`可以商量，但最后最好按我的来。`, analysis:[`你喜欢掌控一切，做事有条不紊。自信爆棚，总觉得自己是主角，别人无法轻易干扰你的计划。你行动果断，原则明确，充满掌控感。`,`你很讨厌混乱、拖延和不可控。无论是生活、关系、工作还是计划，你都希望事情能按逻辑推进。别人觉得差不多就行，但你不行。你要的是清楚、明确、可预判、最好还能按照你的节奏来。`,`你的危险点在于，你的标准很高，而且不太容易被说服。你不是完全听不进建议，而是对方必须说得足够有逻辑、有价值。空口劝你、随便评价你、试图打乱你的安排，都会让你瞬间烦躁。`,`你也有很强的自我认同感。你知道自己想要什么，也知道自己不想成为什么样的人。你不喜欢被动等待，更不喜欢别人替你决定。你可以温和，但不代表你会让出方向盘。`]},
+  {id:`npd`, name:`NPD（自恋型人格）`, attr:`NPD（自恋型人格）（主）+ 抖 S + 腹黑怪`, comment:`全场瞩目，套路明明白白。`, radar:{dou_s:87,dou_m:11,yandere:59,schemer:82,self_punisher:24,controller:73,rampage:52,bpd:38,npd:100}, radar_text:`你不是普通自信，你是自带主角镜头。`, share_text:`我不是爱表现，我只是确实比较亮眼。`, analysis:[`你自信满满，喜欢被关注，同时擅长掌控场面和关系。你在人际和感情中总是主角，别人往往成为你的配角。你精明、心机深沉，但魅力十足。`,`你不是没有自知之明，恰恰相反，你太知道自己的优势在哪里。你知道自己什么时候有吸引力，知道怎样表达更容易被注意，也知道怎样在一群人里保持存在感。你不一定时时刻刻高调，但你不喜欢被忽视。`,`你的危险点在于，你很在意评价，但又不愿意承认自己在意。别人夸你，你表面淡定，心里可能已经爽到开花；别人否定你，你嘴上说无所谓，心里已经开始给对方扣分。你可以接受建议，但不太接受那种居高临下的批评。`,`你也很会经营自己的形象。无论是朋友圈、社交场合，还是亲密关系里，你都希望自己看起来是体面的、有魅力的、不落下风的。你不是单纯自恋，你是有意识地把主角位留给自己。`]},
+  {id:`bpd`, name:`BPD（边缘型人格）`, attr:`BPD（边缘型人格）（主）+ 自虐狂 + 抖 M`, comment:`心像过山车，虐心又甜心。`, radar:{dou_s:36,dou_m:88,yandere:76,schemer:44,self_punisher:93,controller:52,rampage:23,bpd:100,npd:27}, radar_text:`你不是情绪化，你只是太害怕自己不重要。`, share_text:`我不是作，我只是需要确定你真的在。`, analysis:[`情绪起伏大、依赖感强，容易自我牺牲，也享受被掌控的微妙刺激。你在感情中真心投入，但时时常小心翼翼，怕受伤，生活像一场情绪过山车。`,`你对关系里的变化非常敏感。对方一句话少了点热情，回复慢了一点，语气不对一点，你都可能立刻察觉。你不是故意想太多，而是你的情绪雷达太灵了，灵到有时候连你自己都累。`,`你的危险点在于，你很容易在“想靠近”和“怕受伤”之间反复横跳。你渴望被坚定选择，又害怕自己太认真会显得狼狈。你想要安全感，但有时候又会用试探、沉默、别扭来确认对方到底在不在乎。`,`你不是不讲道理，只是情绪上来的时候，道理暂时没有那么好用。你可以很甜、很黏、很真诚，也可以突然陷入低落、敏感、胡思乱想。你真正想要的其实很简单：明确一点，稳定一点，别让我猜。`]},
+  {id:`rampage`, name:`暴走人格`, attr:`暴走人格（主）+ 抖 S + 控制狂`, comment:`说干就干，别挡我路，谁都挡不住我。`, radar:{dou_s:91,dou_m:13,yandere:48,schemer:61,self_punisher:26,controller:84,rampage:100,bpd:39,npd:68}, radar_text:`你不是脾气差，你是忍不了低效和装傻。`, share_text:`我可以冷静，但你最好别逼我开大。`, analysis:[`性格火爆、行动果断，喜欢掌控一切。一旦爆发，你的行动力惊人，高能量的存在让周围人不得不敬畏。你永远是场上的风暴中心。`,`你不是那种喜欢慢慢耗的人。遇到问题，你更倾向于直接处理；遇到冲突，你也不太大喜欢绕来绕去。你讨厌磨叽、讨厌装傻、讨厌别人明明有问题还假装无事发生。你要的是干脆，是痛快，是别浪费时间。`,`你的危险点在于，你的情绪来得快，行动也快。别人还在思考怎么表达，你可能已经把话说出口了。你不是一定想伤人，只是你受不了憋着。你觉得有些事情就该当场说清楚，越拖越烦。`,`但你也不是单纯冲动。你其实很有掌控欲，也很清楚自己想要什么。只是你的执行方式比较猛，像开了加速器。别人可能觉得你不好惹，但你自己知道：只要别踩线，你其实也没那么难相处。`]}
+];
+
+const labels = {dou_s:`抖 S`, dou_m:`抖 M`, yandere:`病娇`, schemer:`腹黑怪`, self_punisher:`自虐狂`, controller:`控制狂`, rampage:`暴走人格`, bpd:`BPD(边缘型)`, npd:`NPD（自恋型）`};
+const colors = {dou_s:{bg:`#FFE3EA`,text:`#FF3B5C`}, dou_m:{bg:`#F1E7FF`,text:`#9B5CFF`}, yandere:{bg:`#FFE4F2`,text:`#FF4FA3`}, schemer:{bg:`#E9E5FF`,text:`#4B2CFF`}, self_punisher:{bg:`#E8F2FF`,text:`#4A90E2`}, controller:{bg:`#FFF0D6`,text:`#FF9F1C`}, npd:{bg:`#FFF6CC`,text:`#D7A400`}, bpd:{bg:`#DDFBF7`,text:`#00B8A9`}, rampage:{bg:`#F3FFD1`,text:`#8BC34A`}};
+const dimOrder = [`rampage`,`bpd`,`npd`,`controller`,`dou_s`,`yandere`,`schemer`,`self_punisher`,`dou_m`];
+
+const app = document.getElementById(`app`);
+let state = `home`;
+let currentQ = 0;
+let scores = {};
+let answers = new Array(20).fill(-1);
+
+function initScores() {Object.keys(labels).forEach(k=>scores[k]=0)}
+initScores();
+
+function render() {
+  if (state===`home`) renderHome();
+  else if (state===`quiz`) renderQuiz();
+  else if (state===`activate`) renderActivate();
+  else if (state===`result`) renderResult();
+}
+
+function renderHome() {
+  app.innerHTML = `<div class="container home fade-in">
+    <div class="card" style="text-align:center">
+      <div class="crystal">🔮</div>
+      <h1>你体内藏着哪种<br>危险人格？</h1>
+      <p class="sub">一次不太正经的隐藏人格小测试</p>
+      <div class="desc-card">
+        <p>每个人心里，都藏着一点危险的小情绪。</p>
+        <p>它可能是偶尔冒出来的占有欲，也可能是忍了很久的小脾气，或者是表面没事、心里早就记账的小心思。</p>
+        <p>把这些危险的小性格拆开来看，你体内最容易潜藏的，到底是哪一种危险人格？</p>
+      </div>
+      <button class="btn-start" onclick="startTest()">开始测试</button>
+    </div>
+  </div>`;
+}
+
+function startTest() {
+  state = `quiz`; currentQ = 0; initScores(); answers = new Array(20).fill(-1);
+  render();
+}
+
+function selectOption(idx) {
+  answers[currentQ] = idx;
+  Object.keys(labels).forEach(k=>scores[k]=0);
+  for (let i=0; i<=currentQ; i++) {
+    if (answers[i]>=0) {
+      const dim = questions[i].scores[answers[i]];
+      scores[dim] = (scores[dim]||0)+2;
+    }
+  }
+  const btns = document.querySelectorAll('.option');
+  btns.forEach((b,i) => b.classList.toggle('selected', i===idx));
+  const nextBtn = document.querySelector('.btn-next');
+  if (nextBtn) nextBtn.disabled = false;
+}
+
+function nextQ() {
+  if (currentQ < 19) {
+    currentQ++;
+    render();
+  }
+}
+
+function calcResult() {
+  if (currentQ===19 && answers[19]>=0) {
+    Object.keys(labels).forEach(k=>scores[k]=0);
+    for (let i=0; i<20; i++) {
+      if (answers[i]>=0) {
+        const dim = questions[i].scores[answers[i]];
+        scores[dim] = (scores[dim]||0)+2;
+      }
+    }
+    if (checkActivated()) {
+      state='result'; render();
+    } else {
+      state='activate'; render();
+    }
+  }
+}
+function renderQuiz() {
+  const q = questions[currentQ];
+  const pct = ((currentQ) / 20 * 100);
+  let optsHtml = q.options.map((o,i)=>`<button class="option${answers[currentQ]===i?' selected':''}" onclick="selectOption(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join(``);
+  app.innerHTML = `<div class="container fade-in">
+    <div class="card quiz-card">
+      <div class="progress-text">第 ${currentQ+1} / 20 题</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="q-num">Q${currentQ+1}</div>
+      <div class="q-title">${q.title}</div>
+      <div class="options-wrap">${optsHtml}</div>
+      <div style="margin-top:auto;text-align:center"><button class="btn-next" ${answers[currentQ]<0?'disabled':''} onclick="${currentQ===19?'calcResult()':'nextQ()'}">${currentQ===19?'查看结果':'下一题'}</button></div>
+    </div>
+  </div>`;
+}
+
+function renderResult() {
+  const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const topId = sorted[0][0];
+  const r = results.find(x=>x.id===topId);
+  const maxVal = Math.max(...Object.values(r.radar));
+  const radarHtml = drawRadar(r.radar);
+  const scoreTags = dimOrder.map(d=>{
+    const pct2 = r.radar[d];
+    const dimLabels = {dou_s:`抖S`, dou_m:`抖M`, yandere:`病娇`, schemer:`腹黑怪`, self_punisher:`自虐狂`, controller:`控制狂`, rampage:`暴走人格`, bpd:`BPD`, npd:`NPD`};
+    return `<span class="score-tag" style="background:${colors[d].bg};color:${colors[d].text}">${dimLabels[d]} ${pct2}${typeof pct2==='number'?'%':''}</span>`;
+  }).join(``);
+  const analysisHtml = r.analysis.map(p=>`<p>${p}</p>`).join(``);
+  app.innerHTML = `<div class="container fade-in">
+    <div class="card result-card">
+      <div class="result-icon">🔮</div>
+      <div class="result-name">${r.name}</div>
+      <div class="result-attr">${r.attr}</div>
+      <div class="result-comment">${r.comment}</div>
+      <div class="scores-wrap">${scoreTags}</div>
+      <div class="radar-wrap">${radarHtml}</div>
+      <div class="radar-text" style="font-size:14px;color:#8B6B5A;margin-bottom:20px;text-align:center">${r.radar_text}</div>
+      <div class="share-text">${r.share_text}</div>
+      <div class="result-analysis">${analysisHtml}</div>
+      <button class="btn-restart" onclick="startTest()">重新测试</button>
+    </div>
+  </div>`;
+}
+
+const radarLabels = {dou_s:`抖S`, dou_m:`抖M`, yandere:`病娇`, schemer:`腹黑怪`, self_punisher:`自虐狂`, controller:`控制狂`, rampage:`暴走人格`, bpd:`BPD`, npd:`NPD`};
+
+function drawRadar(data) {
+  const size = 320, cx = 160, cy = 160, r = 110;
+  const n = dimOrder.length;
+  const angleStep = (Math.PI*2)/n;
+  const maxVal2 = Math.max(...dimOrder.map(d=>typeof data[d]==='number'?data[d]:100));
+  let labels2 = ``;
+  dimOrder.forEach((d,i)=>{
+    const a = -Math.PI/2 + i*angleStep;
+    const lx = cx + Math.cos(a)*(r+24);
+    const ly = cy + Math.sin(a)*(r+24);
+    const anchors = {dou_s:`bottom`,dou_m:`bottom`,yandere:`middle`,schemer:`middle`,self_punisher:`middle`,controller:`middle`,npd:`middle`,bpd:`middle`,rampage:`top`};
+    const ta = lx>cx+r-10?'end':lx<cx-r+10?'start':lx<cx-5?'end':lx>cx+5?'start':'middle';
+    labels2 += `<text x="${lx}" y="${ly}" text-anchor="${ta}" dominant-baseline="${anchors[d]||'middle'}" font-size="11" fill="#666" font-weight="500">${radarLabels[d]}</text>`;
+  });
+  // Grid
+  let grid = ``;
+  [0.25,0.5,0.75,1].forEach(pct=>{
+    const pr = r * pct;
+    let pts = dimOrder.map((d,i)=>{
+      const a = -Math.PI/2 + i*angleStep;
+      return `${cx+Math.cos(a)*pr},${cy+Math.sin(a)*pr}`;
+    }).join(` `);
+    grid += `<polygon points="${pts}" fill="none" stroke="#E8E0DC" stroke-width="1"/>`;
+  });
+  // Data polygon
+  let pts = dimOrder.map((d,i)=>{
+    const a = -Math.PI/2 + i*angleStep;
+    const val = typeof data[d]==='number' ? data[d] : 100;
+    const pr = r * (val/maxVal2);
+    return `${cx+Math.cos(a)*pr},${cy+Math.sin(a)*pr}`;
+  }).join(` `);
+  // Axes
+  let axes = dimOrder.map((d,i)=>{
+    const a = -Math.PI/2 + i*angleStep;
+    return `<line x1="${cx}" y1="${cy}" x2="${cx+Math.cos(a)*r}" y2="${cy+Math.sin(a)*r}" stroke="#E8E0DC" stroke-width="1"/>`;
+  }).join(``);
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${axes}${grid}<polygon points="${pts}" fill="rgba(232,67,93,0.2)" stroke="#E8435D" stroke-width="2"/><circle cx="${cx}" cy="${cy}" r="3" fill="#E8435D"/>${labels2}</svg>`;
+}
+
+const _a='bjkxHAhkQ2MLQ08SZkMZYH1VEGtRSG5oVUF8WxcWViR+blAXbjEZCGRUSG5oVUF8WxcWViR+blMXbjEZCGRUSB8=',_b=[0x35,0x42,0x13,0x77,0x2A,0x5E,0x61];
+function _d(s,k){let r='';for(let i=0;i<s.length;i++){const c=s.charCodeAt(i)^k[i%k.length];r+=String.fromCharCode(c)}return r}
+const codes=JSON.parse(_d(atob(_a),_b));
+
+// ===== 激活方式配置 =====
+// 支持两种模式：
+//   'code'  — 预定义激活码（适用于手动发码）
+//   'order' — 订单号验证（客户输入订单号即可，48h 有效）
+// 切换模式只需要改下面的值
+const ACTIVATION_MODE = 'order';
+const EXPIRY_HOURS = 48;  // 激活后有效期（小时）
+const ORDER_MIN_LEN = 6;  // 订单号最短位数
+const ORDER_MAX_LEN = 20; // 订单号最长位数
+const ORDER_ONLY_NUMERIC = false; // true=纯数字, false=数字+字母
+
+function isCodeMode(){return ACTIVATION_MODE==='code'}
+function checkActivated(){
+  try{
+    if(isCodeMode()) return localStorage.getItem('_da_ok')==='1';
+    // order mode
+    const oid=localStorage.getItem('_da_oid');
+    if(!oid) return false;
+    const ts=parseInt(localStorage.getItem('_da_ts')||'0');
+    if(!ts) return false;
+    return (Date.now()-ts)<EXPIRY_HOURS*3600000;
+  }catch(e){return false}
+}
+function setActivated(oid){
+  try{
+    if(isCodeMode()){localStorage.setItem('_da_ok','1');return}
+    localStorage.setItem('_da_oid',oid);
+    localStorage.setItem('_da_ts',String(Date.now()));
+  }catch(e){}
+}
+
+function renderActivate(){
+  if(isCodeMode()){
+    const _sa=codes.filter(c=>{try{const u=JSON.parse(localStorage.getItem('_du_'+c.k)||'0');return u<c.n}catch(e){return true}});
+    app.innerHTML=`<div class="container fade-in"><div class="card activate-wrap">
+      <div class="icon">🔓</div>
+      <h2>输入激活码</h2>
+      <p>请输入你的激活码解锁完整测评报告</p>
+      <input class="activate-input" id="acInput" type="text" placeholder="请输入激活码" maxlength="20" autocomplete="off">
+      <div class="activate-err" id="acErr">激活码无效或已达使用次数上限</div>
+      <button class="activate-btn" onclick="doActivate()">验证</button>
+      <p style="font-size:12px;color:#C0A090">剩余码数：${_sa.length}</p>
+    </div></div>`;
+  } else {
+    app.innerHTML=`<div class="container fade-in"><div class="card activate-wrap">
+      <div class="icon">🔓</div>
+      <h2>输入订单号验证</h2>
+      <p>请输入你的<b>订单号</b>验证身份<br>验证通过后 ${EXPIRY_HOURS}h 内可随时查看</p>
+      <input class="activate-input" id="acInput" type="text" placeholder="请输入订单号" maxlength="${ORDER_MAX_LEN}" autocomplete="off">
+      <div class="activate-err" id="acErr">订单号格式不正确或已过期</div>
+      <button class="activate-btn" onclick="doActivate()">验证</button>
+      <p style="font-size:12px;color:#C0A090">每张订单仅限一个设备使用</p>
+    </div></div>`;
+  }
+  setTimeout(()=>{try{document.getElementById('acInput').focus()}catch(e){}},100);
+}
+
+function doActivate(){
+  const inp=document.getElementById('acInput').value.trim();
+  const err=document.getElementById('acErr');
+  if(isCodeMode()){
+    const key=inp.toUpperCase();
+    const hit=codes.find(c=>c.k===key);
+    if(!hit){err.style.display='block';return}
+    try{
+      const u=JSON.parse(localStorage.getItem('_du_'+hit.k)||'0');
+      if(u>=hit.n){err.style.display='block';return}
+      localStorage.setItem('_du_'+hit.k,JSON.stringify(u+1));
+      setActivated();
+      state='result';render();
+    }catch(e){err.style.display='block'}
+  } else {
+    // Order mode: validate format
+    const valid = ORDER_ONLY_NUMERIC
+      ? /^\d+$/.test(inp) && inp.length>=ORDER_MIN_LEN && inp.length<=ORDER_MAX_LEN
+      : /^[a-zA-Z0-9]+$/.test(inp) && inp.length>=ORDER_MIN_LEN && inp.length<=ORDER_MAX_LEN;
+    if(!valid){err.style.display='block';return}
+    setActivated(inp);
+    state='result';render();
+  }
+}
+
+render();
+
+</script>
+</body>
+</html>
