@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="心理电量测评 - 测一测你的心理电量还剩多少？">
+<title>精神电量测评 | 测测你的精神电量还剩多少</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+/* ===== Reset & Base ===== */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --bg: #F5F6F8;
+  --surface: #FFFFFF;
+  --ink: #2D3340;
+  --ink-soft: #5B6372;
+  --muted: #A3A9B4;
+  --line: #E8EBF0;
+  --accent: #7BA4E8;
+  --accent-soft: #EEF3FC;
+  --accent-dark: #5A8AC8;
+  --green: #8CC4A0;
+  --yellow: #C9B96E;
+  --orange: #DFA87A;
+  --red: #E88D8D;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --shadow: 0 2px 20px rgba(28,28,40,0.06);
+  --shadow-lg: 0 8px 40px rgba(28,28,40,0.12);
+  --max-w: 440px;
+}
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+.screen { display:none; min-height:100vh; max-width:var(--max-w); margin:0 auto; padding:24px 20px 48px; }
+.screen.active { display:block; }
+
+/* ===== Animations ===== */
+@keyframes fadeUp { from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+@keyframes scaleIn { from{opacity:0; transform:scale(0.92);} to{opacity:1; transform:scale(1);} }
+@keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.1);} }
+@keyframes fillUp { from{width:0;} }
+@keyframes spin { to{transform:rotate(360deg);} }
+.fade-up { animation: fadeUp .5s ease both; }
+.fade-in { animation: fadeIn .4s ease both; }
+.scale-in { animation: scaleIn .5s cubic-bezier(.22,1,.36,1) both; }
+
+/* ===== Intro Screen ===== */
+.intro-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; text-align:center; }
+.intro-icon {
+  width:96px; height:96px; border-radius:50%;
+  background: linear-gradient(135deg, var(--accent) 0%, #A8C8F0 100%);
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:28px; box-shadow: 0 8px 32px rgba(123,164,232,0.25);
+  animation: pulse 3s ease-in-out infinite;
+}
+.intro-icon svg { width:48px; height:48px; fill:#fff; }
+.intro-tag {
+  display:inline-block; font-size:12px; letter-spacing:2px;
+  color: var(--accent); background: var(--accent-soft);
+  padding: 6px 16px; border-radius:100px; margin-bottom:16px; font-weight:600;
+}
+.intro-title { font-size:30px; font-weight:800; letter-spacing:-0.5px; margin-bottom:12px; line-height:1.3; }
+.intro-sub { font-size:15px; color: var(--muted); margin-bottom:8px; line-height:1.8; }
+.intro-desc {
+  font-size:14px; color: var(--ink-soft); line-height:1.8;
+  background: var(--surface); border-radius: var(--radius);
+  padding: 20px 24px; margin: 24px 0; text-align:left; box-shadow: var(--shadow);
+}
+.intro-desc strong { color: var(--accent); }
+.intro-meta { display:flex; gap:24px; margin-bottom:32px; }
+.intro-meta-item { text-align:center; }
+.intro-meta-item .num { font-size:22px; font-weight:800; color: var(--ink); }
+.intro-meta-item .label { font-size:12px; color: var(--muted); margin-top:2px; }
+
+/* ===== Buttons ===== */
+.btn {
+  display:block; width:100%; padding:16px; border:none; border-radius:var(--radius-sm);
+  font-size:16px; font-weight:700; cursor:pointer; transition: all .2s ease;
+  font-family: inherit; text-align:center; letter-spacing:0.5px;
+}
+.btn-primary {
+  background: var(--ink); color:#fff;
+}
+.btn-primary:active { transform: scale(0.98); }
+.btn-accent {
+  background: linear-gradient(135deg, var(--accent) 0%, #A8C8F0 100%);
+  color:#fff; box-shadow: 0 4px 20px rgba(123,164,232,0.3);
+}
+.btn-accent:active { transform: scale(0.98); box-shadow: 0 2px 12px rgba(123,164,232,0.25); }
+.btn-ghost {
+  background: var(--surface); color: var(--ink); border: 1.5px solid var(--line);
+}
+.btn-ghost:active { background: var(--bg); }
+
+/* ===== Quiz Screen ===== */
+.quiz-header { margin-bottom:28px; }
+.quiz-progress-bar {
+  height:6px; background: var(--line); border-radius:100px; overflow:hidden; margin-bottom:14px;
+}
+.quiz-progress-fill {
+  height:100%; background: linear-gradient(90deg, var(--accent), #A8C8F0);
+  border-radius:100px; transition: width .4s cubic-bezier(.22,1,.36,1);
+}
+.quiz-counter { display:flex; justify-content:space-between; font-size:13px; color: var(--muted); }
+.quiz-counter .current { color: var(--accent); font-weight:700; }
+
+.quiz-card {
+  background: var(--surface); border-radius: var(--radius); padding: 32px 24px;
+  box-shadow: var(--shadow); margin-bottom:20px;
+  animation: scaleIn .4s cubic-bezier(.22,1,.36,1) both;
+}
+.quiz-dimension {
+  display:inline-block; font-size:12px; font-weight:600;
+  color: var(--accent); background: var(--accent-soft);
+  padding: 4px 12px; border-radius:100px; margin-bottom:16px;
+}
+.quiz-question { font-size:20px; font-weight:700; line-height:1.5; margin-bottom:24px; color: var(--ink); }
+
+.option-list { display:flex; flex-direction:column; gap:12px; }
+.option-item {
+  background: var(--bg); border: 2px solid transparent; border-radius: var(--radius-sm);
+  padding: 16px 18px; cursor:pointer; transition: all .2s ease;
+  display:flex; align-items:center; gap:14px; font-size:15px; color: var(--ink-soft);
+}
+.option-item:active { transform: scale(0.98); }
+.option-item:hover { border-color: var(--accent); background: var(--accent-soft); }
+.option-item.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
+.option-letter {
+  width:28px; height:28px; border-radius:50%; border: 2px solid var(--line);
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:700; color: var(--muted); flex-shrink:0; transition: all .2s;
+}
+.option-item.selected .option-letter { border-color: var(--accent); background: var(--accent); color:#fff; }
+.option-text { flex:1; }
+
+/* ===== Calculating Screen ===== */
+.calc-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:80vh; }
+.calc-spinner {
+  width:56px; height:56px; border:4px solid var(--accent-soft);
+  border-top-color: var(--accent); border-radius:50%;
+  animation: spin 0.8s linear infinite; margin-bottom:24px;
+}
+.calc-text { font-size:16px; color: var(--ink-soft); font-weight:600; }
+.calc-sub { font-size:13px; color: var(--muted); margin-top:8px; }
+
+/* ===== Verify Screen ===== */
+.verify-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:80vh; padding:0 24px; text-align:center; }
+.verify-icon { width:64px; height:64px; margin-bottom:20px; opacity:0.9; animation: fadeUp .5s ease both; }
+.verify-title { font-size:18px; font-weight:700; color: var(--ink); margin-bottom:8px; animation: fadeUp .5s ease .1s both; }
+.verify-sub { font-size:13px; color: var(--muted); margin-bottom:28px; line-height:1.6; animation: fadeUp .5s ease .15s both; }
+.verify-input-group { width:100%; max-width:300px; animation: fadeUp .5s ease .2s both; }
+.verify-input {
+  width:100%; padding:14px 16px; border:2px solid var(--line); border-radius:12px;
+  font-size:15px; color: var(--ink); background: var(--surface); outline:none;
+  transition: border-color .2s; box-sizing:border-box; text-align:center;
+  letter-spacing: 1px;
+}
+.verify-input:focus { border-color: var(--accent); }
+.verify-input::placeholder { color: var(--muted); letter-spacing:0; }
+.verify-error { font-size:12px; color:#DE8D8D; margin-top:8px; display:none; animation: fadeUp .3s ease both; }
+.verify-btn { width:100%; max-width:300px; margin-top:16px; padding:14px; border-radius:12px; font-size:16px; font-weight:700; }
+.verify-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+.verify-loading { display:none; align-items:center; gap:8px; margin-top:16px; font-size:14px; color: var(--accent); animation: fadeUp .3s ease both; }
+.verify-loading .dot-spin { width:18px; height:18px; border:2.5px solid var(--accent-soft); border-top-color: var(--accent); border-radius:50%; animation: spin .6s linear infinite; }
+
+/* ===== Result Screen ===== */
+#screen-result { padding-bottom:64px; }
+.result-hero {
+  text-align:center; padding: 8px 0 28px;
+  animation: fadeUp .6s ease both;
+}
+.result-battery-wrap {
+  position:relative; display:flex; align-items:center; justify-content:center; gap:16px; margin:0 auto 20px;
+}
+.result-battery {
+  width:104px; height:56px; border:3px solid var(--ink); border-radius:10px;
+  position:relative; overflow:hidden; background: var(--bg); flex-shrink:0;
+}
+.result-battery::after {
+  content:''; position:absolute; right:-10px; top:50%; transform:translateY(-50%);
+  width:7px; height:24px; background: var(--ink); border-radius:0 4px 4px 0;
+}
+.result-battery-fill {
+  position:absolute; bottom:0; left:0; height:100%;
+  border-radius:0 0 7px 7px; transition: width 1.2s cubic-bezier(.22,1,.36,1);
+}
+.result-battery-text {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-size:24px; font-weight:800; z-index:2; color: var(--ink);
+}
+.result-battery-character {
+  width:52px; height:60px; flex-shrink:0; transition: all .5s ease;
+}
+.result-battery-character svg {
+  width:100%; height:100%;
+}
+.result-level-tag {
+  display:inline-block; font-size:12px; letter-spacing:2px; font-weight:600;
+  padding: 6px 16px; border-radius:100px; margin-bottom:12px;
+}
+.result-level-title { font-size:24px; font-weight:800; letter-spacing:-0.3px; margin-bottom:6px; }
+.result-level-score { font-size:14px; color: var(--muted); }
+
+.result-section {
+  background: var(--surface); border-radius: var(--radius); padding: 24px;
+  margin-bottom:16px; box-shadow: var(--shadow);
+  animation: fadeUp .5s ease both;
+}
+.result-section-title {
+  font-size:16px; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:8px;
+}
+.result-section-title .icon { width:20px; height:20px; flex-shrink:0; }
+
+.radar-wrap { position:relative; width:100%; max-width:320px; margin:0 auto; height:280px; }
+.radar-center-label {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  text-align:center; pointer-events:none; z-index:2;
+}
+.radar-center-label .val { font-size:28px; font-weight:800; color: var(--ink); line-height:1; }
+.radar-center-label .lbl { font-size:11px; color: var(--muted); margin-top:4px; }
+
+.result-text { font-size:15px; color: var(--ink-soft); line-height:1.85; }
+
+.suggestion-list { display:flex; flex-direction:column; gap:14px; }
+.suggestion-item { display:flex; gap:12px; align-items:flex-start; }
+.suggestion-num {
+  width:24px; height:24px; border-radius:50%; background: var(--accent-soft); color: var(--accent);
+  display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; margin-top:2px;
+}
+.suggestion-text { font-size:14px; color: var(--ink-soft); line-height:1.8; flex:1; }
+
+.dim-breakdown { display:flex; flex-direction:column; gap:10px; }
+.dim-row { display:flex; align-items:center; gap:12px; }
+.dim-name { font-size:13px; font-weight:600; width:84px; flex-shrink:0; color: var(--ink-soft); }
+.dim-bar { flex:1; height:8px; background: var(--line); border-radius:100px; overflow:hidden; }
+.dim-bar-fill { height:100%; border-radius:100px; transition: width 1s cubic-bezier(.22,1,.36,1) 0.3s; }
+.dim-score { font-size:13px; font-weight:700; width:36px; text-align:right; color: var(--ink); flex-shrink:0; }
+
+.result-actions { display:flex; flex-direction:column; gap:12px; margin-top:8px; }
+.result-footer { text-align:center; font-size:12px; color: var(--muted); margin-top:24px; line-height:1.8; }
+
+/* ===== Share Modal ===== */
+.share-overlay {
+  display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center;
+  padding:20px;
+}
+.share-overlay.active { display:flex; animation: fadeIn .3s ease; }
+.share-box {
+  background: var(--surface); border-radius: var(--radius); padding: 28px 24px;
+  max-width: var(--max-w); width:100%; text-align:center; animation: scaleIn .3s ease;
+}
+.share-box h3 { font-size:18px; margin-bottom:8px; }
+.share-box p { font-size:14px; color: var(--muted); margin-bottom:20px; }
+.share-preview-img { width:100%; border-radius: var(--radius-sm); margin-bottom:16px; max-height:60vh; object-fit:contain; }
+.share-btns { display:flex; gap:10px; }
+
+/* ===== Responsive ===== */
+@media (max-width: 380px) {
+  .intro-title { font-size:26px; }
+  .quiz-question { font-size:18px; }
+  .quiz-card { padding: 24px 18px; }
+  .option-item { padding: 14px 14px; font-size:14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Intro Screen ===== -->
+<div id="screen-intro" class="screen active">
+  <div class="intro-wrap">
+    <div class="intro-icon fade-up">
+      <svg viewBox="0 0 24 24"><path d="M17 4h-3V2h-4v2H7c-1.1 0-2 .9-2 2v15c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-4 13H9v-2h4v2zm0-4H9v-2h4v2zm2.5-5c-.83 0-1.5-.67-1.5-1.5S14.67 5 15.5 5s1.5.67 1.5 1.5S16.33 8 15.5 8z"/></svg>
+    </div>
+    <div class="intro-tag fade-up" style="animation-delay:.1s">MENTAL BATTERY TEST</div>
+    <h1 class="intro-title fade-up" style="animation-delay:.15s">测测你的精神电量还剩多少</h1>
+    <p class="intro-sub fade-up" style="animation-delay:.2s">25道题 × 5个维度，精准测量你的精神能量状态</p>
+    <div class="intro-desc fade-up" style="animation-delay:.25s">
+      你是不是：<br>
+      看似正常生活，实则内心早已电量告急？<br>
+      表面情绪稳定，私下经常莫名疲惫、内耗、焦虑、心累？<br><br>
+      成年人的疲惫从来不写在脸上，<br>
+      而是藏在<strong>精神续航</strong>、<strong>情绪松弛度</strong>、<strong>自我自愈力</strong>里。<br><br>
+      ⚡️当代人专属・精神电量等级测评<br><br>
+      无需复杂答题，通过心理状态综合测算<br>
+      帮你精准测出：<br>
+      当前精神剩余电量➕隐性内耗严重程度➕情绪松弛水平➕自我自愈能力➕抗压续航阈值<br><br>
+      快来测测吧✨
+    </div>
+    <div style="width:100%; max-width:320px;" class="fade-up" style="animation-delay:.3s">
+      <button class="btn btn-accent" onclick="startQuiz()">开始测评 →</button>
+    </div>
+    <p style="font-size:12px; color:var(--muted); margin-top:20px;" class="fade-in" style="animation-delay:.4s">
+      答题无对错之分，请凭第一直觉选择
+    </p>
+  </div>
+</div>
+
+<!-- ===== Quiz Screen ===== -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-header">
+    <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="quiz-counter">
+      <span><span class="current" id="qCurrent">1</span> / 25</span>
+    </div>
+  </div>
+  <div class="quiz-card" id="quizCard">
+    <div class="quiz-dimension" id="qDimTag">第 1 题</div>
+    <div class="quiz-question" id="qText">题目加载中…</div>
+    <div class="option-list" id="optionList"></div>
+  </div>
+</div>
+
+<!-- ===== Calculating Screen ===== -->
+<div id="screen-calc" class="screen">
+  <div class="calc-wrap">
+    <div class="calc-spinner"></div>
+    <div class="calc-text">正在计算你的心理电量…</div>
+    <div class="calc-sub">分析5个维度的能量分布</div>
+  </div>
+</div>
+
+<!-- ===== Verify Screen ===== -->
+<div id="screen-verify" class="screen">
+  <div class="verify-wrap">
+    <div class="verify-icon">
+      <svg viewBox="0 0 64 64" fill="none"><rect x="8" y="12" width="48" height="40" rx="6" stroke="var(--accent)" stroke-width="2.5" fill="var(--bg)"/><path d="M20 32l8 8 16-16" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="verify-title">输入小红书订单号</div>
+    <div class="verify-sub">为了核验测评资格，请输入你在小红书<br>购买本测评的订单编号</div>
+    <div class="verify-input-group">
+      <input class="verify-input" id="verifyInput" type="text" placeholder="请输入订单号" maxlength="30" autocomplete="off">
+      <div class="verify-error" id="verifyError">订单号格式不正确，请检查后重试</div>
+    </div>
+    <button class="btn btn-accent verify-btn" id="verifyBtn" onclick="verifyOrder()">验证并查看结果</button>
+    <div class="verify-loading" id="verifyLoading">
+      <div class="dot-spin"></div>正在核验中…
+    </div>
+    <p style="font-size:11px; color:var(--muted); margin-top:20px; opacity:0.6;">
+      没有订单号？<a href="javascript:void(0)" style="color:var(--accent);" onclick="skipVerify()">先预览看看</a>
+    </p>
+  </div>
+</div>
+
+<!-- ===== Result Screen ===== -->
+<div id="screen-result" class="screen">
+  <div class="result-hero">
+    <div class="result-battery-wrap">
+      <div class="result-battery">
+        <div class="result-battery-fill" id="batteryFill" style="width:0%; background:var(--accent);"></div>
+        <div class="result-battery-text" id="batteryText">0%</div>
+      </div>
+      <div class="result-battery-character" id="batteryCharacter">
+        <svg viewBox="0 0 52 60"></svg>
+      </div>
+    </div>
+    <div class="result-level-tag" id="levelTag">—</div>
+    <div class="result-level-title" id="levelTitle">—</div>
+    <div class="result-level-score" id="levelScore">—</div>
+  </div>
+
+  <!-- Radar Chart -->
+  <div class="result-section" style="animation-delay:.15s">
+    <div class="result-section-title">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="8.5" x2="22" y2="15.5"/><line x1="22" y1="8.5" x2="2" y2="15.5"/></svg>
+      五维能量雷达图
+    </div>
+    <div class="radar-wrap">
+      <canvas id="radarChart"></canvas>
+      <div class="radar-center-label">
+        <div class="val" id="totalScoreDisplay">0</div>
+        <div class="lbl">总分 / 75</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dimension Breakdown -->
+  <div class="result-section" style="animation-delay:.25s">
+    <div class="result-section-title">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="18" y1="20" x2="18" y2="10"/></svg>
+      维度详情
+    </div>
+    <div class="dim-breakdown" id="dimBreakdown"></div>
+  </div>
+
+  <!-- Interpretation -->
+  <div class="result-section" style="animation-delay:.35s">
+    <div class="result-section-title">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      测评解读
+    </div>
+    <div class="result-text" id="interpretationText"></div>
+  </div>
+
+  <!-- Suggestions -->
+  <div class="result-section" style="animation-delay:.45s">
+    <div class="result-section-title">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+      充电建议
+    </div>
+    <div class="suggestion-list" id="suggestionList"></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="result-actions" style="animation-delay:.55s">
+    <button class="btn btn-accent" onclick="shareResult()">分享我的测评结果</button>
+    <button class="btn btn-ghost" onclick="restartQuiz()">重新测评</button>
+  </div>
+  <div class="result-footer">
+    心理电量测评 · 仅供自我探索参考<br>
+    如持续情绪低落，请寻求专业帮助
+  </div>
+</div>
+
+<!-- ===== Share Overlay ===== -->
+<div class="share-overlay" id="shareOverlay">
+  <div class="share-box">
+    <h3>截图分享</h3>
+    <p>长按图片保存，分享给朋友看看</p>
+    <img class="share-preview-img" id="sharePreviewImg" alt="测评结果截图">
+    <div class="share-btns">
+      <button class="btn btn-ghost" onclick="closeShare()">关闭</button>
+      <button class="btn btn-accent" id="downloadBtn" onclick="downloadShare()">下载图片</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== Data: Questions =====
+const DIMENSIONS = ['情绪稳定性', '行动力', '社交能量', '自我接纳', '生活掌控感'];
+
+const QUESTIONS = [
+  // D1: 情绪稳定性
+  { dim:0, q:"早上闹钟响起，你的第一反应是？", opts:[
+    {t:"立刻起床，期待新的一天", s:3},
+    {t:"还行，慢慢起来", s:2},
+    {t:"再躺一会儿……", s:1},
+    {t:"不想面对今天", s:0}
+  ]},
+  { dim:0, q:"当计划突然被打乱，你通常会？", opts:[
+    {t:"很快调整，找到新方向", s:3},
+    {t:"有点烦，但能应对", s:2},
+    {t:"焦虑半天才能缓过来", s:1},
+    {t:"一整天都觉得毁了", s:0}
+  ]},
+  { dim:0, q:"深夜独自一人时，你的内心状态？", opts:[
+    {t:"很平静，享受独处", s:3},
+    {t:"偶尔想多，但还好", s:2},
+    {t:"容易陷入负面思绪", s:1},
+    {t:"经常失眠、焦虑", s:0}
+  ]},
+  { dim:0, q:"被人误解时，你的反应？", opts:[
+    {t:"平静解释，不往心里去", s:3},
+    {t:"会解释，但有点不舒服", s:2},
+    {t:"很委屈，反复回想", s:1},
+    {t:"气到不行，好几天缓不过来", s:0}
+  ]},
+  { dim:0, q:"回想最近一周，你的情绪基调？", opts:[
+    {t:"大部分时间轻松愉快", s:3},
+    {t:"起伏正常，总体还行", s:2},
+    {t:"偏低落，提不起劲", s:1},
+    {t:"经常烦躁、低落", s:0}
+  ]},
+  // D2: 行动力
+  { dim:1, q:"有了新想法，你通常？", opts:[
+    {t:"马上行动试一试", s:3},
+    {t:"想几天，然后开始", s:2},
+    {t:"想很久，经常不了了之", s:1},
+    {t:"只是想想，从不行动", s:0}
+  ]},
+  { dim:1, q:"你的待办清单状态？", opts:[
+    {t:"大部分都能按时完成", s:3},
+    {t:"完成一半左右", s:2},
+    {t:"越积越多", s:1},
+    {t:"清单？什么清单？", s:0}
+  ]},
+  { dim:1, q:"面对必须做但不想做的事？", opts:[
+    {t:"先搞定它，再轻松", s:3},
+    {t:"咬咬牙能做完", s:2},
+    {t:"拖到最后一刻", s:1},
+    {t:"一直拖，经常误事", s:0}
+  ]},
+  { dim:1, q:"给自己定下的目标？", opts:[
+    {t:"基本都能达成", s:3},
+    {t:"完成一部分", s:2},
+    {t:"经常半途而废", s:1},
+    {t:"定过就忘了", s:0}
+  ]},
+  { dim:1, q:"周末没有安排时，你？", opts:[
+    {t:"主动做点有意义的事", s:3},
+    {t:"休息+做点正事", s:2},
+    {t:"大部分时间刷手机", s:1},
+    {t:"躺一天，什么都不想干", s:0}
+  ]},
+  // D3: 社交能量
+  { dim:2, q:"一场社交聚会结束后，你？", opts:[
+    {t:"感觉充实愉快", s:3},
+    {t:"还好，需要休息一下", s:2},
+    {t:"感觉被掏空", s:1},
+    {t:"发誓再也不参加了", s:0}
+  ]},
+  { dim:2, q:"收到一大堆未读消息时？", opts:[
+    {t:"逐一回复，很从容", s:3},
+    {t:"挑重要的先回", s:2},
+    {t:"看一眼就不想回了", s:1},
+    {t:"直接已读不回", s:0}
+  ]},
+  { dim:2, q:"需要在很多人面前发言时？", opts:[
+    {t:"有点兴奋，享受表达", s:3},
+    {t:"紧张但能完成", s:2},
+    {t:"很紧张，想逃跑", s:1},
+    {t:"绝对不行", s:0}
+  ]},
+  { dim:2, q:"对社交邀约的态度？", opts:[
+    {t:"乐意参加，认识新朋友", s:3},
+    {t:"看心情和关系", s:2},
+    {t:"能推就推", s:1},
+    {t:"基本不社交", s:0}
+  ]},
+  { dim:2, q:"连续社交三天后，你？", opts:[
+    {t:"依然有活力", s:3},
+    {t:"需要独处充电", s:2},
+    {t:"已经精疲力竭", s:1},
+    {t:"整个人已经不好了", s:0}
+  ]},
+  // D4: 自我接纳
+  { dim:3, q:"照镜子时，你通常？", opts:[
+    {t:"觉得自己挺好的", s:3},
+    {t:"还行吧，不挑剔", s:2},
+    {t:"总觉得哪里不够好", s:1},
+    {t:"不想照镜子", s:0}
+  ]},
+  { dim:3, q:"看到同龄人取得成就，你？", opts:[
+    {t:"真心为对方高兴", s:3},
+    {t:"有一点点羡慕", s:2},
+    {t:"会焦虑自己的处境", s:1},
+    {t:"觉得自己什么都不行", s:0}
+  ]},
+  { dim:3, q:"犯了一个小错误，你会？", opts:[
+    {t:"改了就好，不纠结", s:3},
+    {t:"会有点自责", s:2},
+    {t:"反复回想很久", s:1},
+    {t:"觉得自己什么都做不好", s:0}
+  ]},
+  { dim:3, q:"别人真诚地夸你时？", opts:[
+    {t:"大方接受，确实如此", s:3},
+    {t:"有点不好意思", s:2},
+    {t:"觉得对方只是客气", s:1},
+    {t:"很不自在，想转移话题", s:0}
+  ]},
+  { dim:3, q:"回顾过去一年的成长？", opts:[
+    {t:"看到自己的进步，很满意", s:3},
+    {t:"有一些成长吧", s:2},
+    {t:"感觉在原地踏步", s:1},
+    {t:"觉得在退步", s:0}
+  ]},
+  // D5: 生活掌控感
+  { dim:4, q:"你的作息规律程度？", opts:[
+    {t:"很规律，基本固定", s:3},
+    {t:"大致有节奏", s:2},
+    {t:"经常打乱", s:1},
+    {t:"完全没规律", s:0}
+  ]},
+  { dim:4, q:"对自己的财务状况？", opts:[
+    {t:"心里有数，有规划", s:3},
+    {t:"大概知道情况", s:2},
+    {t:"有点糊里糊涂", s:1},
+    {t:"不敢看账单", s:0}
+  ]},
+  { dim:4, q:"你的房间/工位状态？", opts:[
+    {t:"整洁有序，定期整理", s:3},
+    {t:"基本整洁", s:2},
+    {t:"偶尔乱，偶尔收拾", s:1},
+    {t:"一直很乱", s:0}
+  ]},
+  { dim:4, q:"想到未来三个月？", opts:[
+    {t:"有期待，有计划", s:3},
+    {t:"顺其自然吧", s:2},
+    {t:"有点迷茫", s:1},
+    {t:"很焦虑，不想面对", s:0}
+  ]},
+  { dim:4, q:"生活在我的掌控之中——你认同吗？", opts:[
+    {t:"完全认同", s:3},
+    {t:"基本认同", s:2},
+    {t:"不太认同", s:1},
+    {t:"完全不认同", s:0}
+  ]}
+];
+
+// ===== Data: Levels =====
+const LEVELS = [
+  {
+    min:0, max:20,
+    color:'#DE8D8D', bgColor:'#F9EBEB',
+    tag:'电量耗尽',
+    title:'重度内耗型',
+    desc:'你的心理电量已经亮起了红灯。每一天都像是在<strong>低电量模式</strong>下艰难运行，大量能量被内耗消耗——反复的自我怀疑、过度思虑、情绪波动，让你即使什么都没做也感到精疲力竭。\n\n这不是你的错，这是你的身心在向你发出信号：是时候停下来，好好关照自己了。',
+    suggestions:[
+      '停止自我批判：你不需要<strong>马上好起来</strong>，允许自己有低谷期，这本身就是一种力量',
+      '做<strong>最小行动</strong>：每天只做一件让自己有微小成就感的事，哪怕只是整理桌面',
+      '建立能量边界：学会说<strong>不</strong>，减少不必要的社交和消耗性关系',
+      '减少信息摄入：暂时远离让你焦虑的内容，给自己一个<strong>信息排毒期</strong>',
+      '寻求支持：如持续低落超过两周，建议寻求专业心理咨询，这不是软弱，是勇敢'
+    ]
+  },
+  {
+    min:21, max:40,
+    color:'#D4A07A', bgColor:'#F8EFE6',
+    tag:'低电量',
+    title:'疲惫消耗型',
+    desc:'你的心理电量处于偏低水平，虽然在运转，但消耗大于补充。你可能经常感到疲惫、缺乏动力，<strong>想改变但使不上劲</strong>是你的常态。\n\n好消息是，你已经意识到了问题，只需要找到正确的<strong>充电方式</strong>，就能逐步回升。',
+    suggestions:[
+      '找到你的<strong>充电桩</strong>：列出3件让你真正放松的事，每周至少做1件',
+      '减少决策疲劳：固定日常小事的流程（穿什么、吃什么），把精力留给重要的事',
+      '微习惯起步：每天5分钟的运动、阅读或冥想，比一次性的大改变更可持续',
+      '清理情绪债务：写下一直困扰你的事，区分<strong>能改变的</strong>和<strong>不能改变的</strong>',
+      '建立睡眠仪式：固定入睡时间，睡前30分钟远离屏幕'
+    ]
+  },
+  {
+    min:41, max:60,
+    color:'#C0B072', bgColor:'#F8F4E6',
+    tag:'中电量',
+    title:'波动起伏型',
+    desc:'你的心理电量处于中等水平，时高时低。好的时候你觉得充满希望，差的时候又容易陷入低谷。\n\n这种波动是正常的，但如果你能找到稳定的<strong>能量锚点</strong>，就能从起伏走向平稳上升。你已经在路上了，只是还需要更稳固的底盘。',
+    suggestions:[
+      '建立情绪日记：记录情绪波动的时间和触发因素，找到你的<strong>低电量模式</strong>规律',
+      '打造日常锚点：固定1-2个每日仪式（如晨间咖啡、晚间散步），让生活有节奏感',
+      '主动管理社交能量：质量优先于数量，把精力留给真正滋养你的关系',
+      '设定<strong>够好</strong>标准：不要追求完美，<strong>完成比完美更重要</strong>',
+      '定期复盘：每周花15分钟回顾，庆祝小胜利，调整下周方向'
+    ]
+  },
+  {
+    min:61, max:80,
+    color:'#8CC4A0', bgColor:'#EDF6F0',
+    tag:'高电量',
+    title:'松弛自愈型',
+    desc:'恭喜！你的心理电量处于健康的高水平。你拥有良好的自我调节能力，遇到挫折能够较快恢复，对生活有掌控感，也有余力去关心他人。\n\n你身上有一种<strong>松弛感</strong>——不是躺平，而是在努力和放松之间找到了平衡。继续保持，你正走在对的方向上。',
+    suggestions:[
+      '深化优势：你最强的维度是什么？把它发挥到极致，成为你的核心竞争力',
+      '帮助他人：你的松弛感可以感染身边人，适度分享你的经验',
+      '持续探索：在稳定的基础上，给自己设一个新的成长挑战',
+      '建立韧性储备：趁状态好时，建立应对低谷的<strong>工具箱</strong>（运动、冥想、社交等）',
+      '关注薄弱维度：看看雷达图上哪项偏低，有意识地补强'
+    ]
+  },
+  {
+    min:81, max:100,
+    color:'#7BA4E8', bgColor:'#EEF3FC',
+    tag:'满电量',
+    title:'充盈自在型',
+    desc:'你的心理电量满格！这不仅仅是<strong>没有问题</strong>，而是一种积极主动的生命状态。你对自己有清晰的认知，对生活有真实的掌控感，情绪稳定且充满弹性。\n\n你身上有一种难得的<strong>自在感</strong>——既能在顺境中享受，也能在逆境中保持内核稳定。你是身边人的能量源。',
+    suggestions:[
+      '成为照亮他人的光：你的状态是稀缺的，考虑通过分享、写作影响更多人',
+      '保持觉察：高电量状态下也要定期自检，避免过度消耗',
+      '探索意义层面：从<strong>过得好</strong>迈向<strong>活得有意义</strong>，思考你想留下什么',
+      '持续精进：找到下一个成长方向，保持<strong>终身学习者</strong>的心态',
+      '享受当下：别忘了享受这份充盈，它值得被好好感受'
+    ]
+  }
+];
+
+// ===== Character SVGs (5 states) =====
+// Each character is a white rounded figure with mood-specific face & pose
+const CHARACTER_DATA = [
+  // 0: 电量耗尽 - sad, drooping, tear
+  { bg:'#F0EEF5', inner:`
+    <!-- Body -->
+    <rect x="4" y="6" width="44" height="46" rx="22" fill="#FFFFFF"/>
+    <rect x="4" y="6" width="44" height="46" rx="22" fill="none" stroke="#E0DEE8" stroke-width="1"/>
+    <!-- Eyes: droopy arcs -->
+    <path d="M16,24 Q22,28 28,24" fill="none" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+    <path d="M28,24 Q34,28 40,24" fill="none" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+    <!-- Mouth: sad curve -->
+    <path d="M20,38 Q28,34 36,38" fill="none" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+    <!-- Tear -->
+    <circle cx="42" cy="28" r="2.5" fill="#C8D8EE"/>
+    <!-- Arms: drooping -->
+    <line x1="6" y1="36" x2="1" y2="48" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+    <line x1="46" y1="36" x2="51" y2="48" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+  `},
+  // 1: 低电量 - tired, slouched
+  { bg:'#F0EEF5', inner:`
+    <rect x="4" y="6" width="44" height="46" rx="22" fill="#FFFFFF"/>
+    <rect x="4" y="6" width="44" height="46" rx="22" fill="none" stroke="#E0DEE8" stroke-width="1"/>
+    <!-- Eyes: small dots, low -->
+    <circle cx="20" cy="26" r="2.5" fill="#C0BEC8"/>
+    <circle cx="36" cy="26" r="2.5" fill="#C0BEC8"/>
+    <!-- Mouth: slight frown -->
+    <line x1="22" y1="40" x2="34" y2="40" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+    <!-- Arms: relaxed down -->
+    <line x1="6" y1="36" x2="4" y2="46" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+    <line x1="46" y1="36" x2="48" y2="46" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+  `},
+  // 2: 中电量 - neutral
+  { bg:'#F0EEF5', inner:`
+    <rect x="4" y="6" width="44" height="46" rx="22" fill="#FFFFFF"/>
+    <rect x="4" y="6" width="44" height="46" rx="22" fill="none" stroke="#E0DEE8" stroke-width="1"/>
+    <!-- Eyes: normal dots -->
+    <circle cx="20" cy="24" r="3" fill="#C0BEC8"/>
+    <circle cx="36" cy="24" r="3" fill="#C0BEC8"/>
+    <!-- Mouth: neutral line -->
+    <line x1="22" y1="38" x2="34" y2="38" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+    <!-- One arm slightly raised -->
+    <line x1="6" y1="34" x2="4" y2="44" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+    <line x1="46" y1="32" x2="48" y2="40" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+  `},
+  // 3: 高电量 - happy, one arm up
+  { bg:'#F0EEF5', inner:`
+    <rect x="4" y="6" width="44" height="46" rx="22" fill="#FFFFFF"/>
+    <rect x="4" y="6" width="44" height="46" rx="22" fill="none" stroke="#E0DEE8" stroke-width="1"/>
+    <!-- Eyes: happy arcs -->
+    <path d="M16,24 Q20,20 24,24" fill="none" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+    <path d="M32,24 Q36,20 40,24" fill="none" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+    <!-- Mouth: smile -->
+    <path d="M22,36 Q30,43 38,36" fill="none" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+    <!-- Arms: one up, one relaxed -->
+    <line x1="6" y1="32" x2="2" y2="40" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+    <line x1="46" y1="28" x2="48" y2="18" stroke="#C0BEC8" stroke-width="2" stroke-linecap="round"/>
+  `},
+  // 4: 满电量 - super happy, both arms up, sparkles
+  { bg:'#EDF2FB', inner:`
+    <rect x="4" y="6" width="44" height="46" rx="22" fill="#FFFFFF"/>
+    <rect x="4" y="6" width="44" height="46" rx="22" fill="none" stroke="#D0DCF0" stroke-width="1"/>
+    <!-- Sparkles -->
+    <path d="M44,14 l2,-2 l-2,-2 l2,2 l2,-2 l-2,2 l2,2 l-2,-2 z" fill="#A2C4F0" transform="translate(-34,-4) scale(0.8)"/>
+    <path d="M44,14 l2,-2 l-2,-2 l2,2 l2,-2 l-2,2 l2,2 l-2,-2 z" fill="#A2C4F0" transform="translate(-6,2) scale(0.6)"/>
+    <!-- Eyes: happy arcs bigger -->
+    <path d="M15,22 Q19,17 23,22" fill="none" stroke="#90ADC8" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M29,22 Q33,17 37,22" fill="none" stroke="#90ADC8" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Blush -->
+    <circle cx="16" cy="29" r="4" fill="#FDE4E4" opacity="0.6"/>
+    <circle cx="36" cy="29" r="4" fill="#FDE4E4" opacity="0.6"/>
+    <!-- Mouth: big smile -->
+    <path d="M20,32 Q28,43 36,32" fill="none" stroke="#90ADC8" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Arms: both up joyfully -->
+    <line x1="6" y1="28" x2="0" y2="14" stroke="#90ADC8" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="46" y1="28" x2="52" y2="14" stroke="#90ADC8" stroke-width="2.5" stroke-linecap="round"/>
+  `}
+];
+
+// ===== State =====
+let currentQ = 0;
+let answers = new Array(25).fill(-1);
+let totalScore = 0;
+let dimScores = [0,0,0,0,0];
+let dimPercentages = [0,0,0,0,0];
+let resultLevel = null;
+let radarChartInstance = null;
+
+// ===== Screen Management =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ===== Quiz Logic =====
+function startQuiz() {
+  currentQ = 0;
+  answers = new Array(25).fill(-1);
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  const progress = ((currentQ) / 25) * 100;
+
+  document.getElementById('progressFill').style.width = progress + '%';
+  document.getElementById('qCurrent').textContent = currentQ + 1;
+  document.getElementById('qDimTag').textContent = '第 ' + (currentQ + 1) + ' 题';
+  document.getElementById('qText').textContent = q.q;
+
+  const list = document.getElementById('optionList');
+  list.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.opts.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option-item';
+    if (answers[currentQ] === i) div.classList.add('selected');
+    div.innerHTML = `<div class="option-letter">${letters[i]}</div><div class="option-text">${opt.t}</div>`;
+    div.onclick = () => selectOption(i);
+    list.appendChild(div);
+  });
+
+  // Re-trigger card animation
+  const card = document.getElementById('quizCard');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = '';
+}
+
+function selectOption(i) {
+  answers[currentQ] = i;
+
+  // Update visual
+  const items = document.querySelectorAll('.option-item');
+  items.forEach((el, idx) => {
+    el.classList.toggle('selected', idx === i);
+  });
+
+  // Advance after short delay
+  setTimeout(() => {
+    if (currentQ < 24) {
+      currentQ++;
+      renderQuestion();
+    } else {
+      finishQuiz();
+    }
+  }, 300);
+}
+
+function finishQuiz() {
+  document.getElementById('progressFill').style.width = '100%';
+  showScreen('screen-calc');
+
+  // Calculate scores
+  totalScore = 0;
+  dimScores = [0,0,0,0,0];
+  answers.forEach((ansIdx, qIdx) => {
+    const q = QUESTIONS[qIdx];
+    const score = q.opts[ansIdx].s;
+    totalScore += score;
+    dimScores[q.dim] += score;
+  });
+
+  dimPercentages = dimScores.map(s => Math.round((s / 15) * 100));
+  const percentage = Math.round((totalScore / 75) * 100);
+
+  // Find level
+  resultLevel = LEVELS.find(l => percentage >= l.min && percentage <= l.max) || LEVELS[0];
+
+  // Delay for effect
+  setTimeout(() => {
+    showScreen('screen-verify');
+  }, 1800);
+}
+
+function verifyOrder() {
+  const input = document.getElementById('verifyInput');
+  const error = document.getElementById('verifyError');
+  const btn = document.getElementById('verifyBtn');
+  const loading = document.getElementById('verifyLoading');
+  const orderNo = input.value.trim();
+
+  // Basic validation: non-empty and reasonable format
+  if (!orderNo || orderNo.length < 6) {
+    error.style.display = 'block';
+    input.style.borderColor = '#DE8D8D';
+    return;
+  }
+
+  // Simulate verification
+  error.style.display = 'none';
+  input.style.borderColor = 'var(--line)';
+  btn.style.display = 'none';
+  loading.style.display = 'flex';
+
+  setTimeout(() => {
+    showScreen('screen-result');
+    renderResult(Math.round((totalScore / 75) * 100));
+  }, 1500);
+}
+
+function skipVerify() {
+  const error = document.getElementById('verifyError');
+  const input = document.getElementById('verifyInput');
+  error.style.display = 'none';
+  input.style.borderColor = 'var(--line)';
+  showScreen('screen-result');
+  renderResult(Math.round((totalScore / 75) * 100));
+}
+
+function renderResult(percentage) {
+  // Battery visual
+  const fill = document.getElementById('batteryFill');
+  const text = document.getElementById('batteryText');
+  fill.style.background = resultLevel.color;
+
+  // Animate battery fill
+  setTimeout(() => { fill.style.width = percentage + '%'; }, 100);
+
+  // Animate number
+  animateNumber(text, 0, percentage, 1200, (v) => v + '%');
+
+  // Ensure text stays readable on fill
+  text.style.color = percentage > 55 ? '#FFFFFF' : '#2D3340';
+
+  // Character - pick the right mood based on level index
+  const levelIdx = LEVELS.indexOf(resultLevel);
+  const charContainer = document.getElementById('batteryCharacter');
+  const charData = CHARACTER_DATA[levelIdx] || CHARACTER_DATA[2];
+  charContainer.style.background = charData.bg;
+  charContainer.style.borderRadius = '50%';
+  charContainer.innerHTML = `<svg viewBox="0 0 52 60">${charData.inner}</svg>`;
+
+  // Level tag
+  const tag = document.getElementById('levelTag');
+  tag.textContent = resultLevel.tag;
+  tag.style.color = resultLevel.color;
+  tag.style.background = resultLevel.bgColor;
+
+  document.getElementById('levelTitle').textContent = resultLevel.title;
+  document.getElementById('levelScore').textContent = `总分 ${totalScore} / 75 · 电量 ${percentage}%`;
+
+  // Total score display
+  document.getElementById('totalScoreDisplay').textContent = totalScore;
+  document.getElementById('totalScoreDisplay').style.color = resultLevel.color;
+
+  // Interpretation
+  document.getElementById('interpretationText').innerHTML = resultLevel.desc.split('\n\n').map(p => `<p style="margin-bottom:12px;">${p}</p>`).join('');
+
+  // Suggestions
+  const sList = document.getElementById('suggestionList');
+  sList.innerHTML = '';
+  resultLevel.suggestions.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'suggestion-item';
+    div.innerHTML = `<div class="suggestion-num">${i+1}</div><div class="suggestion-text">${s}</div>`;
+    sList.appendChild(div);
+  });
+
+  // Dimension breakdown
+  const breakdown = document.getElementById('dimBreakdown');
+  breakdown.innerHTML = '';
+  DIMENSIONS.forEach((name, i) => {
+    const pct = dimPercentages[i];
+    const color = getDimColor(pct);
+    const row = document.createElement('div');
+    row.className = 'dim-row';
+    row.innerHTML = `
+      <div class="dim-name">${name}</div>
+      <div class="dim-bar"><div class="dim-bar-fill" style="width:0%; background:${color};"></div></div>
+      <div class="dim-score">${dimScores[i]}/15</div>
+    `;
+    breakdown.appendChild(row);
+    // Animate bar
+    setTimeout(() => {
+      row.querySelector('.dim-bar-fill').style.width = pct + '%';
+    }, 100 + i * 100);
+  });
+
+  // Radar chart
+  setTimeout(() => renderRadarChart(), 200);
+}
+
+function getDimColor(pct) {
+  if (pct >= 80) return '#7BA4E8';
+  if (pct >= 60) return '#8CC4A0';
+  if (pct >= 40) return '#C0B072';
+  if (pct >= 20) return '#D4A07A';
+  return '#DE8D8D';
+}
+
+function renderRadarChart() {
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  if (radarChartInstance) radarChartInstance.destroy();
+
+  radarChartInstance = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: DIMENSIONS,
+      datasets: [{
+        label: '你的能量',
+        data: dimPercentages,
+        backgroundColor: resultLevel.color + '33',
+        borderColor: resultLevel.color,
+        borderWidth: 2,
+        pointBackgroundColor: resultLevel.color,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { display: false, stepSize: 20 },
+          grid: { color: '#ECECEE' },
+          angleLines: { color: '#ECECEE' },
+          pointLabels: {
+            font: { size: 12, weight: '600' },
+            color: '#4A4A5C'
+          }
+        }
+      },
+      animation: { duration: 1200, easing: 'easeOutCubic' }
+    }
+  });
+}
+
+function animateNumber(el, from, to, duration, formatter) {
+  const start = performance.now();
+  function step(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const value = Math.round(from + (to - from) * eased);
+    el.textContent = formatter ? formatter(value) : value;
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ===== Share =====
+async function shareResult() {
+  const overlay = document.getElementById('shareOverlay');
+  const img = document.getElementById('sharePreviewImg');
+  const downloadBtn = document.getElementById('downloadBtn');
+
+  img.src = '';
+  downloadBtn.style.display = 'none';
+  overlay.classList.add('active');
+
+  try {
+    const canvas = await html2canvas(document.getElementById('screen-result'), {
+      backgroundColor: '#F6F6F4',
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      scrollY: 0,
+      windowWidth: document.getElementById('screen-result').offsetWidth
+    });
+    const dataUrl = canvas.toDataURL('image/png');
+    img.src = dataUrl;
+    downloadBtn.style.display = 'block';
+    downloadBtn.onclick = function() {
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = '心理电量测评结果.png';
+      a.click();
+    };
+  } catch(e) {
+    console.error('Screenshot failed:', e);
+    alert('截图生成失败，请尝试使用手机自带截屏功能');
+  }
+}
+
+function closeShare() {
+  document.getElementById('shareOverlay').classList.remove('active');
+}
+
+// ===== Restart =====
+function restartQuiz() {
+  currentQ = 0;
+  answers = new Array(25).fill(-1);
+  totalScore = 0;
+  dimScores = [0,0,0,0,0];
+  dimPercentages = [0,0,0,0,0];
+  if (radarChartInstance) { radarChartInstance.destroy(); radarChartInstance = null; }
+  showScreen('screen-intro');
+}
+
+// ===== Prevent body scroll on option tap (iOS) =====
+document.addEventListener('touchmove', function(e) {
+  if (e.target.closest('.option-item')) e.preventDefault();
+}, { passive: false });
+</script>
+</body>
+</html>
